@@ -1,0 +1,140 @@
+# Starship prompt config
+# Reference: https://starship.rs/config/
+
+format = """
+[](color_orange)\
+$os\
+$username\
+[](bg:color_yellow fg:color_orange)\
+$directory\
+[](fg:color_yellow bg:color_aqua)\
+$git_branch\
+$git_status\
+[](fg:color_aqua bg:color_blue)\
+$python\
+$nodejs\
+$rust\
+$golang\
+$docker_context\
+[](fg:color_blue bg:color_purple)\
+${custom.ollama}\
+${custom.gpu}\
+[](fg:color_purple bg:color_bg3)\
+$time\
+[ ](fg:color_bg3)\
+$line_break$character"""
+
+palette = 'catppuccin_mocha'
+
+[palettes.catppuccin_mocha]
+color_fg0     = '#cdd6f4'
+color_bg1     = '#1e1e2e'
+color_bg3     = '#45475a'
+color_blue    = '#89b4fa'
+color_aqua    = '#94e2d5'
+color_green   = '#a6e3a1'
+color_orange  = '#fab387'
+color_purple  = '#cba6f7'
+color_red     = '#f38ba8'
+color_yellow  = '#f9e2af'
+
+[os]
+disabled = false
+style = "bg:color_orange fg:color_fg0"
+
+[os.symbols]
+Debian = ""
+Ubuntu = ""
+Linux  = ""
+
+[username]
+show_always = true
+style_user = "bg:color_orange fg:color_fg0"
+style_root = "bg:color_red fg:color_fg0"
+format = '[ $user ]($style)'
+
+[directory]
+style = "fg:color_fg0 bg:color_yellow"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = " "
+"Downloads" = " "
+"Music"     = " "
+"Pictures"  = " "
+
+[git_branch]
+symbol = ""
+style = "bg:color_aqua"
+format = '[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)'
+
+[git_status]
+style = "bg:color_aqua"
+format = '[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)'
+
+[python]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version)(\($virtualenv\)) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $context) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:color_bg3"
+format = '[[  $time ](fg:color_fg0 bg:color_bg3)]($style)'
+
+[line_break]
+disabled = false
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:color_green)'
+error_symbol   = '[❯](bold fg:color_red)'
+vimcmd_symbol  = '[❮](bold fg:color_green)'
+
+[cmd_duration]
+min_time = 500
+format = '[ took $duration ](fg:color_yellow)'
+
+# ─── Custom segments ───────────────────────────────────────────────
+# Refresh handled by helper scripts via cache files (TTL: gpu=5s, ollama=30s)
+
+[custom.ollama]
+command = "$HOME/.local/bin/starship-ollama"
+when = "systemctl is-active --quiet ollama"
+symbol = "󰒋 "
+style = "bg:color_purple fg:color_fg0"
+format = '[[ $symbol($output) ](fg:color_fg0 bg:color_purple)]($style)'
+shell = ["bash", "--noprofile", "--norc"]
+description = "Ollama service + model count"
+
+[custom.gpu]
+command = "$HOME/.local/bin/starship-gpu"
+when = "command -v nvidia-smi"
+symbol = "󰢮 "
+style = "bg:color_purple fg:color_fg0"
+format = '[[ $symbol($output) ](fg:color_fg0 bg:color_purple)]($style)'
+shell = ["bash", "--noprofile", "--norc"]
+description = "GPU VRAM usage"

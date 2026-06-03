@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Cached GPU VRAM segment for Starship.
+# Refreshes every 5s to avoid blocking the prompt.
+set -u
+CACHE="${XDG_RUNTIME_DIR:-/tmp}/starship-gpu.cache"
+TTL=5
+
+if [ -f "$CACHE" ] && [ $(( $(date +%s) - $(stat -c %Y "$CACHE") )) -lt "$TTL" ]; then
+    cat "$CACHE"
+    exit 0
+fi
+
+if ! command -v nvidia-smi >/dev/null 2>&1; then
+    : > "$CACHE"
+    exit 0
+fi
+
+read -r used total < <(nvidia-smi --query-gpu=memory.used,memory.total \
+                                   --format=csv,noheader,nounits 2>/dev/null \
+                       | head -1 | tr -d ',')
+if [ -z "${used:-}" ] || [ -z "${total:-}" ]; then
+    : > "$CACHE"
+    exit 0
+fi
+
+pct=$(( used * 100 / total ))
+printf '%dM/%dM (%d%%)' "$used" "$total" "$pct" | tee "$CACHE"

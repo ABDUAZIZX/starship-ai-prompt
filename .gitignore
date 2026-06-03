@@ -1,0 +1,9 @@
+# Local backups created by install.sh
+*.bak.*
+
+# Runtime cache files (should never be here, but just in case)
+starship-*.cache
+
+# Editor / OS noise
+*.swp
+.DS_Store

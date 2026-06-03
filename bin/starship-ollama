@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Cached Ollama status segment for Starship.
+# Returns "<N> models" if ollama is active, else nothing.
+set -u
+CACHE="${XDG_RUNTIME_DIR:-/tmp}/starship-ollama.cache"
+TTL=30
+
+if [ -f "$CACHE" ] && [ $(( $(date +%s) - $(stat -c %Y "$CACHE") )) -lt "$TTL" ]; then
+    cat "$CACHE"
+    exit 0
+fi
+
+if ! systemctl is-active --quiet ollama 2>/dev/null; then
+    : > "$CACHE"
+    exit 0
+fi
+
+# Count loaded models (running) vs available — via HTTP API (faster than `ollama list`)
+running=$(curl -s --max-time 1 http://127.0.0.1:11434/api/ps 2>/dev/null \
+          | grep -oE '"name"' | wc -l)
+total=$(curl -s --max-time 1 http://127.0.0.1:11434/api/tags 2>/dev/null \
+        | grep -oE '"model":' | wc -l)
+
+if [ -n "$running" ] && [ "$running" -gt 0 ]; then
+    printf '%d/%d loaded' "$running" "$total" | tee "$CACHE"
+else
+    printf '%d models' "$total" | tee "$CACHE"
+fi
