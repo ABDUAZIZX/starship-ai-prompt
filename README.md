@@ -26,7 +26,7 @@ Non-NVIDIA or non-systemd machines work fine — the relevant segment just stays
 ## Install
 
 ```bash
-git clone https://github.com/azoz8/starship-ai-prompt.git
+git clone https://github.com/ABDUAZIZX/starship-ai-prompt.git
 cd starship-ai-prompt
 ./install.sh
 ```
